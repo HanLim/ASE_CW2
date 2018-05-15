@@ -58,33 +58,49 @@ namespace ExactArithmetic
 	//  Arithmetic Operators
 	Integer Integer::operator+(const Integer & right) const
 	{
-		Integer res = *this;	// Copy left argument to result list
+		Integer res = *this;	
 
-		// ensure l is long enough & add in all of r
-		// will work with const & parameters
 		int ll = digits.size(), lr = right.digits.size();
 
 		int longer = (ll < lr ? lr : ll);
 
-		// Could pad to same length (with leading 0)
 		std::fill_n(back_inserter(res.digits), longer - ll, 0);
 
-		// Add right argument to result
 		std::transform(right.digits.begin(), right.digits.end(),
 			res.digits.begin(), res.digits.begin(), std::plus<int>());
 
-		// Adjust the result if there is any digits > 9
 		res.adjust();
-
+		
 		return (res);
 
 	}
 
-	Integer Integer::operator-(const Integer &) const
+	Integer Integer::operator-(const Integer & right) const
 	{
-		Integer res;
+		Integer l = *this, r = right;
+		std::list<Digit>::iterator lIterator = l.digits.begin(),
+			rIterator = r.digits.begin();
 
-		return res;
+		for (; lIterator != l.digits.end() && rIterator != r.digits.end(); lIterator++, rIterator++) {
+			if (*lIterator < *rIterator) {
+				int count = 0;
+
+				do {
+					if (lIterator == l.digits.end()) break;
+					*lIterator += 10;
+					lIterator++;
+					*lIterator -= 1;
+					count++;
+				} while (*lIterator < 0);
+
+				for (int a = 0; a < count; a++) {
+					lIterator--;
+				}
+			}
+			*lIterator -= *rIterator;
+		}
+		l.adjust();
+		return l;
 	}
 
 	Integer Integer::operator*(const Integer &) const
@@ -187,18 +203,16 @@ namespace ExactArithmetic
 
 
 	// Compound Assignment operators
-	Integer & Integer::operator+=(const Integer &)
+	Integer & Integer::operator+=(const Integer &r)
 	{
-		Integer res;
-
-		return res;
+		*this = *this + r;
+		return *this;
 	}
 
-	Integer & Integer::operator-=(const Integer &)
+	Integer & Integer::operator-=(const Integer & r)
 	{
-		Integer res;
-
-		return res;
+		*this = *this - r;
+		return *this;
 	}
 
 	Integer & Integer::operator*=(const Integer &)
@@ -228,50 +242,62 @@ namespace ExactArithmetic
 	// pre-increment
 	Integer & Integer::operator++()
 	{
-		Integer res;
-
-		return res;
+		*this = *this + Integer(1);
+		adjust();
+		return *this;
 	}
 
 	// post-increment
 	Integer Integer::operator++(int)
 	{
-		Integer res;
-
+		Integer res = *this;
+		*this += Integer(1);
+		adjust();
 		return res;
 	}
 
 	// pre-decrement
 	Integer & Integer::operator--()
 	{
-		Integer res;
-
-		return res;
+		*this = *this - Integer(1);
+		adjust();
+		return *this;
 	}
 
 	// post-decrement
 	Integer Integer::operator--(int)
 	{
-		Integer res;
-
+		Integer res = *this;
+		*this -= Integer(1);
+		adjust();
 		return res;
 	}
 
 	std::string Integer::toString() const
 	{
-		std::string aStr;
-
-		return aStr;
+		std::string str;
+		Integer res = *this;
+		std::list<Digit>::reverse_iterator first = res.digits.rbegin();
+		std::list<Digit>::reverse_iterator last = res.digits.rend();
+		while (first != last) {
+			str.push_back(*first + '0');
+			first++;
+		}
+		return str;
 	}
 
 	// Friend declarations
-	std::ostream & operator<<(std::ostream & out, const Integer &)
+	std::ostream & operator<<(std::ostream & out, const Integer & integer)
 	{
+		out << integer.toString();
 		return out;
 	}
 
-	std::istream & operator>>(std::istream & in, Integer &)
+	std::istream & operator>>(std::istream & in, Integer & integer)
 	{
+		std::string str;
+		in >> str;
+		integer = Integer(str);
 		return in;
 	}
 

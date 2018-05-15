@@ -113,17 +113,20 @@ namespace ExactArithmetic
 	{
 		if (r.digits.size() > digits.size()) return false;
 		if (r.digits.size() < digits.size()) return true;
+		if (*this == r) return false;
 
 		Integer rr = r;
-		std::list<Digit> lD = digits,
-			rD = rr.digits;
-		std::list<Digit>::iterator lIterator = lD.end(),
-			rIterator = rD.end();
-
-		for (; lIterator != lD.begin(); lIterator--, rIterator--) {
-			if (*lIterator > *rIterator) return false;
-		}
-
+		std::list<Digit> lD = digits, rD = rr.digits;
+		//std::list<Digit>::iterator lIterator = lD.end(),
+		//	rIterator = rD.end();
+		//for (; lIterator != lD.begin(); lIterator--, rIterator--) {
+		//	if (*lIterator > *rIterator) return false;
+		//}
+		std::reverse(lD.begin(), lD.end());
+		std::reverse(rD.begin(), rD.end());
+		std::pair<std::list<Digit>::iterator, std::list<Digit>::iterator> num;
+		num = std::mismatch(lD.begin(), lD.end(), rD.begin());
+		if (*num.first > *num.second) return false;
 		return true;
 	}
 
@@ -131,17 +134,20 @@ namespace ExactArithmetic
 	{
 		if (r.digits.size() < digits.size()) return false;
 		if (r.digits.size() > digits.size()) return true;
+		if (*this == r) return false;
 
 		Integer rr = r;
-		std::list<Digit> lD = digits,
-			rD = rr.digits;
-		std::list<Digit>::iterator lIterator = lD.end(),
-			rIterator = rD.end();
-
-		for (; lIterator != lD.begin(); lIterator--, rIterator--) {
-			if (*lIterator < *rIterator) return false;
-		}
-
+		std::list<Digit> lD = digits, rD = rr.digits;
+		//std::list<Digit>::iterator lIterator = lD.end(),
+		//	rIterator = rD.end();
+		//for (; lIterator != lD.begin(); lIterator--, rIterator--) {
+		//	if (*lIterator < *rIterator) return false;
+		//}
+		std::reverse(lD.begin(), lD.end());
+		std::reverse(rD.begin(), rD.end());
+		std::pair<std::list<Digit>::iterator, std::list<Digit>::iterator> num;
+		num = std::mismatch(lD.begin(), lD.end(), rD.begin());
+		if (*num.first < *num.second) return false;
 		return true;
 	}
 
